@@ -45,6 +45,8 @@ void setup()
 
   pinMode(LEFT_LINE_SENSOR_PIN, INPUT);
   pinMode(RIGHT_LINE_SENSOR_PIN, INPUT);
+
+  delay(2000);
 }
 
 void moveForward()
@@ -142,7 +144,7 @@ bool opponentOnRight(bool leftDetected, bool midDetected, bool rightDetected)
 
 bool lineDetected(int leftPin, int rightPin)
 {
-  bool leftWhite = digitalRead(leftPin);
+  bool leftWhite = false;
   bool rightWhite = digitalRead(rightPin);
   if (leftWhite || rightWhite)
   {
@@ -154,7 +156,8 @@ bool lineDetected(int leftPin, int rightPin)
 void findOpponent()
 {
   int leftDistance = getDistance(LEFT_SR04_TRIG_PIN, LEFT_SR04_ECHO_PIN);
-  int midDistance = getDistance(MID_SR04_TRIG_PIN, MID_SR04_ECHO_PIN);
+  int midDistance = 0;
+  // int midDistance = getDistance(MID_SR04_TRIG_PIN, MID_SR04_ECHO_PIN);
   int rightDistance = getDistance(RIGHT_SR04_TRIG_PIN, RIGHT_SR04_ECHO_PIN);
   int sideDistance = getDistance(SIDE_SR04_TRIG_PIN, SIDE_SR04_ECHO_PIN);
 
@@ -163,28 +166,34 @@ void findOpponent()
   bool rightDetected = opponentDetected(rightDistance);
   bool sideDetected = opponentDetected(sideDistance);
 
+
   if (opponentInFront(leftDetected, midDetected, rightDetected))
   {
     moveForward();
+    Serial.println("Forward");
     return;
   }
   if (opponentOnLeft(leftDetected, midDetected, rightDetected))
   {
     turnLeft();
+    Serial.println("Left");
     return;
   }
   if (opponentOnRight(leftDetected, midDetected, rightDetected))
   {
     turnRight();
+    Serial.println("Right");
     return;
   }
   if (sideDetected)
   {
-    turnLeft();
+    turnRight();
+    Serial.println("Side");
     delay(SIDE_ROTATE_DELAY);
     return;
   }
-  turnRight();
+  turnLeft();
+  Serial.println("Turn around");
 }
 
 void loop()
@@ -192,6 +201,7 @@ void loop()
   if (lineDetected(LEFT_LINE_SENSOR_PIN, RIGHT_LINE_SENSOR_PIN))
   {
     moveBackward();
+    Serial.println("Backward");
     delay(BACKWARD_DELAY);
   }
   findOpponent();
