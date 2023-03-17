@@ -22,7 +22,7 @@
 #define LEFT_LINE_SENSOR_PIN A2
 #define RIGHT_LINE_SENSOR_PIN A3
 
-#define BACKWARD_DELAY 1000
+#define BACKWARD_DELAY 500
 #define SIDE_ROTATE_DELAY 1000
 
 
@@ -97,7 +97,7 @@ int getDistance(int trigPin, int echoPin)
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
-  long duration = pulseIn(echoPin, HIGH, 2940);
+  long duration = pulseIn(echoPin, HIGH, 3440);
   int distance = duration * 0.034 / 2;
   return distance;
 }
@@ -145,7 +145,8 @@ bool opponentOnRight(bool leftDetected, bool midDetected, bool rightDetected)
 bool lineDetected(int leftPin, int rightPin)
 {
   bool leftWhite = false;
-  bool rightWhite = digitalRead(rightPin);
+  bool rightWhite = analogRead(rightPin) < 100;
+  // Serial.print(analogRead(rightPin));
   if (leftWhite || rightWhite)
   {
     return true;
@@ -203,6 +204,7 @@ void loop()
     moveBackward();
     Serial.println("Backward");
     delay(BACKWARD_DELAY);
+    return;
   }
   findOpponent();
 }
